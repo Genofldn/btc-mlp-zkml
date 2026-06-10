@@ -93,11 +93,18 @@ def main():
     prob_down = 1.0 - prob_up
     call      = "UP ↑" if prob_up >= 0.5 else "DOWN ↓"
 
-    print(f"\n  Timestamp    : {ts}")
-    print(f"  Current BTC  : ${current_price:,.2f}")
-    print(f"  P(UP in 24h) : {prob_up*100:.1f}%")
-    print(f"  P(DOWN)      : {prob_down*100:.1f}%")
-    print(f"  Call         : {call}")
+    # Expected return = weighted average of conditional means from training data
+    MEAN_UP_RET   =  0.01742   # avg 24h return on UP days (training set)
+    MEAN_DOWN_RET = -0.01740   # avg 24h return on DOWN days (training set)
+    expected_ret  = prob_up * MEAN_UP_RET + prob_down * MEAN_DOWN_RET
+    pred_price    = current_price * (1 + expected_ret)
+
+    print(f"\n  Timestamp      : {ts}")
+    print(f"  Current BTC    : ${current_price:,.2f}")
+    print(f"  Predicted 24h  : ${pred_price:,.2f}  ({expected_ret*100:+.2f}%)")
+    print(f"  P(UP)          : {prob_up*100:.1f}%")
+    print(f"  P(DOWN)        : {prob_down*100:.1f}%")
+    print(f"  Call           : {call}")
     print()
     print("Key signals:")
     print(f"  RSI (14)   : {latest['rsi14']*100:.0f}  (oversold <30, overbought >70)")
